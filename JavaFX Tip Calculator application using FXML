@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="TipCalculatorController"
+      alignment="CENTER"
+      spacing="12"
+      prefWidth="400"
+      prefHeight="350"
+      style="-fx-padding: 20;">
+
+    <Label text="Tip Calculator"
+           style="-fx-font-size: 24px; -fx-font-weight: bold;"/>
+
+    <Label text="Bill Amount:"/>
+    <TextField fx:id="billAmountField"
+               promptText="Enter bill amount"/>
+
+    <Label text="Tip Percentage:"/>
+    <TextField fx:id="tipPercentageField"
+               promptText="Enter tip percentage"/>
+
+    <Button text="Calculate Tip"
+            onAction="#calculateTip"
+            maxWidth="Infinity"/>
+
+    <Button text="Reset"
+            onAction="#reset"
+            maxWidth="Infinity"/>
+
+    <Label fx:id="tipAmountLabel"
+           text="Tip Amount: $0.00"/>
+
+    <Label fx:id="errorMessageLabel"
+           wrapText="true"
+           style="-fx-text-fill: red;"/>
+
+</VBox>
+2. Controller Class — TipCalculatorController.java
+This class handles calculations, input validation, error messages, and resetting the fields.
+
+java
+
+import javafx.fxml.FXML;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+
+public class TipCalculatorController {
+
+    @FXML
+    private TextField billAmountField;
+
+    @FXML
+    private TextField tipPercentageField;
+
+    @FXML
+    private Label tipAmountLabel;
+
+    @FXML
+    private Label errorMessageLabel;
+
+    @FXML
+    private void calculateTip() {
+        try {
+            double billAmount =
+                Double.parseDouble(billAmountField.getText().trim());
+
+            double tipPercentage =
+                Double.parseDouble(tipPercentageField.getText().trim());
+
+            // Validate input values
+            if (!Double.isFinite(billAmount)
+                    || !Double.isFinite(tipPercentage)
+                    || billAmount < 0
+                    || tipPercentage < 0) {
+                errorMessageLabel.setText(
+                    "Error: Please enter valid non-negative numbers."
+                );
+                tipAmountLabel.setText("");
+                return;
+            }
+
+            // Calculate tip
+            double tipAmount = billAmount * tipPercentage / 100.0;
+
+            // Display result
+            tipAmountLabel.setText(
+                String.format("Tip Amount: $%.2f", tipAmount)
+            );
+
+            errorMessageLabel.setText("");
+
+        } catch (NumberFormatException e) {
+            tipAmountLabel.setText("");
+            errorMessageLabel.setText(
+                "Error: Invalid input. Please enter numbers."
+            );
+        }
+    }
+
+    @FXML
+    private void reset() {
+        billAmountField.clear();
+        tipPercentageField.clear();
+        tipAmountLabel.setText("");
+        errorMessageLabel.setText("");
+    }
+}
+3. Main Application Class — TipCalculatorApp.java
+This class loads the FXML file and displays the application window.
+
+java
+
+import javafx.application.Application;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.stage.Stage;
+
+public class TipCalculatorApp extends Application {
+
+    @Override
+    public void start(Stage primaryStage) throws Exception {
+
+        FXMLLoader loader = new FXMLLoader(
+            getClass().getResource("tip_calculator.fxml")
+        );
+
+        Parent root = loader.load();
+
+        Scene scene = new Scene(root, 400, 350);
+
+        primaryStage.setTitle("Tip Calculator");
+        primaryStage.setScene(scene);
+        primaryStage.show();
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
